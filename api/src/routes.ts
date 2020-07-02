@@ -15,6 +15,7 @@ const genresController = new GenresController();
 
 routes.get('/content', contentController.index);
 routes.get('/content/:id', contentController.show);
+routes.delete('/content/:id', contentController.delete);
 routes.post('/content', upload.single('thumbnail'), contentController.create);
 
 routes.get('/episodes/:id', episodesController.index);

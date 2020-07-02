@@ -35,21 +35,31 @@ class ContentController {
       return response.status(400).json({ message: 'Point not found.' });
     }
 
-    const genres = await knex('genres')
-      .join('content_genres', 'genres.id', '=', 'content_genres.genre_id')
-      .where('content_genres.content_id', id)
-      .select('genres.name');
+    // const genres = await knex('genres')
+    //   .join('content_genr-es', 'genres.id', '=', 'content_genres.genre_id')
+    //   .where('content_genres.content_id', id)
+    //   .select('genres.*');
 
-    const episodes = await knex('episodes').where('content_id', '=', id);
+    // const episodes = await knex('episodes').where('content_id', '=', id);
 
-    return response.json({ content, genres, episodes });
+    console.log(content);
+
+    return response.json(content);
+  }
+
+  async delete(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params;
+
+    await knex('content').where('id', '=', id).del();
+
+    return response.json({ message: 'deleted' });
   }
 
   async create(request: Request, response: Response): Promise<Response> {
     const { name, description, genres } = request.body;
     const { filename, path: filePath, destination } = request.file;
 
-    const parsedName = name.replace(' ', '');
+    const parsedName = name.split(' ').join('');
 
     fs.mkdir(
       path.resolve(destination, parsedName),
@@ -93,8 +103,8 @@ class ContentController {
     await trx.commit();
 
     await sharp(filePath)
-      .resize(500)
-      .jpeg({ quality: 70 })
+      .resize(900)
+      .jpeg({ quality: 100 })
       .toFile(path.resolve(destination, parsedName, filename));
 
     fs.unlinkSync(filePath);
